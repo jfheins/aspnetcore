@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.AspNetCore.Blazor.Rendering
 {
@@ -15,16 +16,28 @@ namespace Microsoft.AspNetCore.Blazor.Rendering
 
         private static int _nextId;
         private static Dictionary<int, WebAssemblyRenderer> _renderers = new Dictionary<int, WebAssemblyRenderer>();
+        private readonly static bool _isWebAssembly = RuntimeInformation.IsOSPlatform(OSPlatform.Create("WEBASSEMBLY"));
 
         internal static WebAssemblyRenderer Find(int rendererId)
         {
+            if (!_isWebAssembly)
+            {
+                throw new InvalidOperationException("Renderer registry can only be modified from WebAssembly runtime.");
+            }
+
             return _renderers.ContainsKey(rendererId)
                 ? _renderers[rendererId]
                 : throw new ArgumentException($"There is no renderer with ID {rendererId}.");
+
+
         }
 
         public static int Add(WebAssemblyRenderer renderer)
         {
+            if (!_isWebAssembly)
+            {
+                throw new InvalidOperationException("Renderer registry can only be modified from WebAssembly runtime.");
+            }
             var id = _nextId++;
             _renderers.Add(id, renderer);
             return id;
@@ -32,6 +45,10 @@ namespace Microsoft.AspNetCore.Blazor.Rendering
 
         public static bool TryRemove(int rendererId)
         {
+            if (!_isWebAssembly)
+            {
+                throw new InvalidOperationException("Renderer registry can only be modified from WebAssembly runtime.");
+            }
             if (_renderers.ContainsKey(rendererId))
             {
                 _renderers.Remove(rendererId);
