@@ -81,11 +81,10 @@ namespace Templates.Test
             }
         }
 
-        [ConditionalTheory(Skip = "See: https://github.com/dotnet/aspnetcore/issues/20520")]
+        [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        [SkipOnHelix("ef restore no worky")]
-        [QuarantinedTest]
+        [SkipOnHelix("Selenium not supported on Helix.")]
         public async Task BlazorServerTemplateWorks_IndividualAuth(bool useLocalDB)
         {
             Project = await ProjectFactory.GetOrCreateProject("blazorserverindividual" + (useLocalDB ? "uld" : ""), Output);
